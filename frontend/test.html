@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test - Cyber Sentinel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>📝 Cyber Sentinel Test</h2>
+  <p>Logged in as: <span id="userDisplay"></span></p>
+  <div id="questionsContainer"></div>
+  <button onclick="submitTest()">Submit Test</button>
+
+  <script>
+    // Redirect to login if not logged in
+    const username = localStorage.getItem('username');
+    if (!username) {
+      window.location.href = 'login.html';
+    }
+    document.getElementById('userDisplay').innerText = username;
+
+    let questions = [];
+
+    async function loadQuestions() {
+      const response = await fetch('http://localhost:5000/questions');
+      questions = await response.json();
+
+      const container = document.getElementById('questionsContainer');
+      questions.forEach((q, index) => {
+        const box = document.createElement('div');
+        box.className = 'question-box';
+
+        let optionsHtml = '';
+        q.options.forEach((opt, optIndex) => {
+          optionsHtml += `
+            <label>
+              <input type="radio" name="q${index}" value="${optIndex}">
+              ${opt}
+            </label>`;
+        });
+
+        box.innerHTML = `<strong>${index + 1}. ${q.question}</strong>${optionsHtml}`;
+        container.appendChild(box);
+      });
+    }
+
+    async function submitTest() {
+      const answers = [];
+      questions.forEach((q, index) => {
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        answers.push(selected ? parseInt(selected.value) : -1);
+      });
+
+      const response = await fetch('http://localhost:5000/submit-test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answers })
+      });
+      const data = await response.json();
+
+      localStorage.setItem('score', data.score);
+      localStorage.setItem('total', data.total);
+      window.location.href = 'result.html';
+    }
+
+    loadQuestions();
+  </script>
+</body>
+</html>

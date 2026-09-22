@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Result - Cyber Sentinel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>✅ Test Complete</h2>
+  <p>Logged in as: <span id="userDisplay"></span></p>
+  <h3 id="scoreDisplay"></h3>
+  <button onclick="logout()">Logout</button>
+
+  <script>
+    const username = localStorage.getItem('username');
+    if (!username) {
+      window.location.href = 'login.html';
+    }
+    document.getElementById('userDisplay').innerText = username;
+
+    const score = localStorage.getItem('score');
+    const total = localStorage.getItem('total');
+    document.getElementById('scoreDisplay').innerText = `Your Score: ${score} / ${total}`;
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = 'login.html';
+    }
+  </script>
+</body>
+</html>
